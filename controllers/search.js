@@ -55,11 +55,20 @@ module.exports = {
                         ctx.response.body = fs.createReadStream(path.join('./eBooks', book['bookID']));
                     }
                     else {//search
-                        ctx.render('admin.njk', {
-                            books: await ctx.findAll(table, {
-                                [col]: q
-                            })
-                        });
+                        if (q[0] === ':')
+                            return ctx.render('admin.njk', {
+                                books: await ctx.findAllReg(table, col, q.substring(1))
+                            });
+                        else if (q === "")
+                            return ctx.render('admin.njk', {
+                                books: await ctx.findAllReg(table, col, '.*')
+                            });
+                        else
+                            return ctx.render('admin.njk', {
+                                books: await ctx.findAll(table, {
+                                    [col]: q
+                                })
+                            });
                     }
                 }
                 else if (table === 'users') {//readers
@@ -82,11 +91,20 @@ module.exports = {
                         })
                     }
                     else {//search
-                        ctx.render('admin.njk', {
-                            users: await ctx.findAll(table, {
-                                [col]: q
-                            })
-                        });
+                        if (q[0] === ':')
+                            return ctx.render('admin.njk', {
+                                users: await ctx.findAllReg(table, col, q.substring(1))
+                            });
+                        else if (q === "")
+                            return ctx.render('admin.njk', {
+                                users: await ctx.findAllReg(table, col, '.*')
+                            });
+                        else
+                            return ctx.render('admin.njk', {
+                                users: await ctx.findAll(table, {
+                                    [col]: q
+                                })
+                            });
                     }
                 }
                 else {//records
@@ -146,11 +164,22 @@ module.exports = {
                             records: [record]
                         })
                     }
-                    else ctx.render('admin.njk', {
-                        records: await ctx.findAll(table, {
-                            [col]: q
-                        })
-                    });
+                    else {//search 需要说明的一点是lendTime和BorrowTime只能支持：YYYY-MM-DD HH:MM:SS
+                        if (q[0] === ':')
+                            return ctx.render('admin.njk', {
+                                records: await ctx.findAllReg(table, col, q.substring(1))
+                            });
+                        else if (q === "")
+                            return ctx.render('admin.njk', {
+                                records: await ctx.findAllReg(table, col, '.*')
+                            });
+                        else
+                            return ctx.render('admin.njk', {
+                                records: await ctx.findAll(table, {
+                                    [col]: q
+                                })
+                            });
+                    }
                 }
             }
         }
@@ -227,12 +256,23 @@ module.exports = {
                         });
                 }
                 else {//普通search
-                    ctx.render('user.njk', {
-                        userID: userID,
-                        books: await ctx.findAll('books', {
-                            [col]: q
-                        })
-                    });
+                    if (q[0] === ':')
+                        return ctx.render('user.njk', {
+                            userID: userID,
+                            books: await ctx.findAllReg(table, col, q.substring(1))
+                        });
+                    else if (q === "")
+                        return ctx.render('admin.njk', {
+                            userID: userID,
+                            books: await ctx.findAllReg(table, col, '.*')
+                        });
+                    else
+                        return ctx.render('user.njk', {
+                            userID: userID,
+                            books: await ctx.findAll(table, {
+                                [col]: q
+                            })
+                        });
                 }
             }
         }

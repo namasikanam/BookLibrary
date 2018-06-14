@@ -1,6 +1,7 @@
 const
     Sequelize = require('sequelize'),
-    config = require('./config');
+    config = require('./config'),
+    Op = Sequelize.Op;
 
 const sequelize = new Sequelize(config.database, config.username, config.password, {
     host: config.host,
@@ -38,6 +39,17 @@ module.exports = async (ctx, next) => {
         return models[table].findAll({
             where: where
         });
+    };
+    ctx.findAllReg = async (table, col, reg) => {
+        if ((table && col && reg) === undefined) throw new Error("No enough arguments for findAllReg!");
+
+        return models[table].findAll({
+            where: {
+                [col]: {
+                    [Op.regexp]: reg
+                }
+            }
+        })
     };
 
     //有就加进去，否则就不加。
