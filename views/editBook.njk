@@ -1,0 +1,46 @@
+{% extends "addBook.njk" %}
+
+{% block header %}
+    <title>Edit A Book in Library</title>
+    {{ super() }}
+{% endblock %}
+
+{% block main %}
+    <div class="ui middle aligned center aligned grid">
+        <div class="column" style="max-width:1000px">
+            <form id="addBook" class="ui large form piled segment" action="/editBook" method="post" enctype="multipart/form-data">
+                <div class="field">
+                    <input class="ui input" type="text" placeholder="BookID" maxlength="128" value="{{book.bookID}}" disabled>
+                    <input type="hidden" name="bookID" value="{{book.bookID}}">
+                </div>
+
+                <div class="field">
+                    <input class="ui input" type="text" name="bookName" placeholder="Book Name" maxlength="128" value="{{book.bookName}}">
+                </div>
+
+                <div class="two fields">
+                    <div class="field">
+                        <input class="ui input" type="text" name="author" placeholder="Author" maxlength="128" value="{{book.author}}">
+                    </div>
+                    <div class="field">
+                        <input class="ui input" type="text" name="press" placeholder="Press" maxlength="128" value="{{book.press}}">
+                    </div>
+                </div>
+
+                <div class="three fields">
+                    <div class="field" style="width: 40%">
+                        <input class="ui input" type="number" id="number" name="number" placeholder="Number" maxlength="128" min="0" max="1048576" value=0>
+                    </div>
+                    <div class="field" style="width: 30%">
+                        <input class="ui input" type="file" name="eBook" placeholder="eBook" size="4294967296" multiple>
+                    </div>
+                    <div class="field" style="width: 30%">
+                        <div class="ui fluid large submit button">Edit book</div>
+                    </div>
+                </div>
+
+                <div class="ui error message"></div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

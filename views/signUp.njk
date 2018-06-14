@@ -1,0 +1,15 @@
+{% extends "index.njk" %}
+{% import 'userForm.njk' as userForm %}
+
+{% block head %}
+    <title>Sign Up To Library</title>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    {{ userForm.script() }}
+{% endblock %}
+
+{% block main %}
+    {{ userForm.form('/signUp', 'Sign up') }}
+{% endblock %}

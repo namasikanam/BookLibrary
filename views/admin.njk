@@ -1,0 +1,157 @@
+{% extends "base.njk" %}
+{% import 'segments.njk' as segments %}
+
+{% block head %}
+    <title>admin's Library</title>
+
+    <script>if(location.pathname != '/')history.replaceState({},`admin's Library`,'/');</script>
+{% endblock %}
+
+{% block script %}
+    <script>
+        $(function(){
+            //tables:default select,onchange
+            $('#tables').dropdown('set selected','books');
+            $('#tables').dropdown({
+                action: 'activate',
+                onChange: function(value, text){
+                    $('.prompt').attr('placeholder',`Search ${value[0]} by ${$('#cols').dropdown('get value')[0].toLowerCase()}...`);
+                    if(value === 'books'){
+                        $('#cols').dropdown('change values',
+                            [{
+                                name: 'BookID',
+                                value: 'bookID'
+                            },{
+                                name: 'Book Name',
+                                value: 'bookName'
+                            },{
+                                name: 'Author',
+                                value: 'author'
+                            },{
+                                name: 'Press',
+                                value: 'press'
+                            }]);
+                        $('#cols').dropdown('set selected','bookID');
+                    }
+                    else if(value === 'users'){
+                        $('#cols').dropdown('change values',
+                            [{
+                                name: 'UserID',
+                                value: 'userID'
+                            },{
+                                name: 'Username',
+                                value: 'userName'
+                            }]);
+                        $('#cols').dropdown('set selected','userID');
+                    }
+                    else{
+                        $('#cols').dropdown('change values',
+                            [{
+                                name: 'RecordID',
+                                value: 'recordID'
+                            },{
+                                name: 'UserID',
+                                value: 'userID'
+                            },{
+                                name: 'BookID',
+                                value: 'bookID'
+                            },{
+                                name: 'Lend Time',
+                                value: 'lendTime'
+                            },{
+                                name: 'Return Time',
+                                value: 'returnTime'
+                            }]);
+                        $('#cols').dropdown('set selected','RecordID');
+                    }
+                }
+            });
+
+            //cols:default select,onchange
+            $('#cols').dropdown('set selected','bookID');
+            $('#cols').dropdown({
+                action: 'activate',
+                onChange: function(value, text){
+                    $('.prompt').attr('placeholder',`Search ${$('#tables').dropdown('get value')} by ${value.toLowerCase()}...`);
+                }
+            });
+
+            $('#adds').dropdown();
+
+            //search!
+            function query(opt){
+                $(location).attr('href',`/?table=${$('#tables').dropdown('get value')}&col=${$('#cols').dropdown('get value')}&q=${$('.search').search('get value')[0]}`);
+            };
+            $('#searchInput').keydown(function (e) {
+                if (e.which == 13) {
+                    query();
+                    return false;
+                }
+            });
+            $('.search.icon').click(function(e){
+                query();
+                return false;
+            })
+        });
+    </script>
+{% endblock %}
+
+{% block menu %}
+    <div id="tables" class="ui dropdown item">
+        <span class="text"></span>
+        <i class="dropdown icon"></i>
+
+        <div class="menu">
+            <div class="item" data-value="books">Books</div>
+            <div class="item" data-value="users">Users</div>
+            <div class="item" data-value="records">Records</div>
+        </div>
+    </div>
+
+    <div id="cols" class="ui dropdown item">
+        <span class="text"></span>
+        <i class="dropdown icon"></i>
+
+        <div class="menu">
+            <div class="item" data-value="bookID">BookID</div>
+            <div class="item" data-value="bookName">Book Name</div>
+            <div class="item" data-value="author">Author</div>
+            <div class="item" data-value="press">Press</div>
+        </div>
+    </div>
+
+    <div class="ui search white fluid item" style="flex-grow:1;">
+        <div class="ui transparent icon input" id="searchInput">
+            <input class="prompt" type="text" placeholder="Search books by bookid..." autofocus>
+            <i class="search link icon"></i>
+        </div>
+        <div class="results"></div>
+    </div>
+
+    <div class="right menu">
+        <div id="adds" class="ui dropdown item">
+            <span class="text">Add</span>
+            <i class="dropdown icon"></i>
+
+            <div class="menu">
+                <a class="item" href="/addBook">Book</a>
+                <a class="item" href="/addUser">User</a>
+            </div>
+        </div>
+
+        <div class="item">
+            <i class="chess king icon"></i>
+            <span class="text" style="font-family: Apple Chancery, cursive">admin</span>
+        </div>
+        <a class="item" href="/signOut">
+            <i class="sign out icon"></i>
+            <span class="text">Sign out</span>
+        </a>
+    </div>
+{% endblock %}
+
+{% block main %}
+    {{ segments.book(books,'admin') }}
+    {{ segments.user(users) }}
+    {{ segments.record(records,'admin') }}
+{% endblock %}

@@ -1,0 +1,80 @@
+{% import 'segments.njk' as segments %}
+{% extends "base.njk" %}
+
+{% block head %}
+    <title>{{userID}}'s Library</title>
+
+    <script>
+        $(function(){
+            //改变地址栏中的地址
+            if(location.pathname!='/')history.replaceState({}, '', '/');
+        });
+    </script>
+{% endblock %}
+
+{% block script %}
+    <script>
+        $(function(){
+            //select时改变search prompt placeholder
+            $('.dropdown').dropdown('set selected', 'bookID');
+            $('.dropdown').dropdown({
+                action: 'activate',
+                onChange: function(value, text){
+                    $('.prompt').attr('placeholder', `Search books by ${value}...`);
+                }
+            });
+
+            //search:enter or click!
+            function query(){
+                $(location).attr('href', `/?col=${$('.dropdown').dropdown('get value')[0]}&q=${$('.search').search('get value')[0]}`);
+            };
+            $('#searchInput').keydown(function (e) {
+                if (e.which == 13) {
+                    query();
+                    return false;
+                }
+            });
+            $('.search.icon').click(function(e){
+                query();
+                return false;
+            })
+        });
+    </script>
+{% endblock %}
+
+{% block menu %}
+    <div class="ui dropdown item">
+        <span class="text"></span>
+        <i class="dropdown icon"></i>
+
+        <div class="menu">
+            <div class="item" data-value="bookID">BookID</div>
+            <div class="item" data-value="bookName">Book Name</div>
+            <div class="item" data-value="author">Author</div>
+            <div class="item" data-value="press">Press</div>
+        </div>
+    </div>
+
+    <div class="ui search white fluid item" style="flex-grow:1;">
+        <div class="ui transparent icon input" id="searchInput">
+            <input class="prompt" type="text" placeholder="Search books by bookID..." autofocus>
+            <i class="search link icon"></i>
+        </div>
+        <div class="results"></div>
+    </div>
+    
+    <div class="right menu">
+        <a class="item" style="font-family: Apple Chancery, cursive" href='/lends'>
+            <i class="user icon"></i>
+            <span class="text" style="font-family: Apple Chancery, cursive">{{userID}}</span>
+        </a>
+        <a id="signOut" class="item" href="/signOut">
+            <i class="sign out icon"></i>
+            <span class="text">Sign out</span>
+        </a>
+    </div>
+{% endblock %}
+
+{% block main %}
+    {{ segments.book(books, "user") }}
+{% endblock %}

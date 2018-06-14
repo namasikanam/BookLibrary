@@ -1,0 +1,168 @@
+{% macro book(books, auth) %}
+    {% for book in books %}
+        <div class="ui piled segment">
+            <h4 class="header">{{book.bookName}}</h4>
+            <div>BookID: <span name="bookID">{{book.bookID}}</span> </div>
+            <div>Author: {{book.author}}</div>
+            <div>Press: {{book.press}}</div>
+            <div>Pending: {{book.pending}}</div>
+            <div>Lending: {{book.lending}}</div>
+            <div>Returning: {{book.returning}}</div>
+            <div>Returned: {{book.returned}}</div>
+            <div>eBook: 
+                {% if book.eBook %}
+                    <a target="_blank">{{book.eBook}}</a>
+                {% endif %}
+            </div>
+
+            {% if auth === 'user' %}
+                {% if book.returned %}
+                    <div class="ui right internal rail" style="max-width:80px">
+                        <a id="lend" class="ui very basic inverted icon button" data-content="Send Lending Request">
+                            <i class="ui black paper plane icon"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="ui right internal rail" style="max-width:120px">
+                    <a id="del" class="ui very basic inverted icon button" data-content="Delete Book">
+                        <i class="ui black trash icon"></i>
+                    </a>
+                    <a id="edit" class="ui very basic inverted icon button" data-content="Edit Book">
+                        <i class="ui black edit icon"></i>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    {% if books %}
+        <script>
+            $(function(){
+                if(location.pathname === '/')
+                    $('.segment').each(function(){
+                        var eBook = $(this).find('a[target=_blank]');
+                        if(eBook.length) eBook.attr('href', `/?table=books&col=bookID&q=` + $(this).find('span').text() + `&opt=ebook`);
+                    });
+            });
+        </script>
+
+        {% if auth === 'user' %}
+            <script>
+                $(function(){
+                    if(location.pathname === '/')
+                        $('.segment').each(function(){
+                            var bookID = $(this).find('span').text();
+                            $(this).find('#lend').attr('href', '/?table=books&col=bookID&q=' + bookID + '&opt=lend');
+                        });
+                });
+            </script>
+        {% else %}
+            <script>
+                $(function(){
+                    $('.segment').each(function(){
+                        var bookID=$(this).find('span').text();
+                        $(this).find('#del').attr('href','/?table=books&col=bookID&q='+bookID+'&opt=del');
+                        $(this).find('#edit').attr('href','/editBook/?table=books&col=bookID&q='+bookID);
+                    });
+                });
+            </script>
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+{% macro user(users) %}
+    {% for user in users %}
+        <div class="ui piled segment">
+            <h4 class="ui header">{{user.userName}}</h4>
+            <div>userID: 
+                <span>{{user.userID}}</span>
+            </div>
+
+            <div class="ui right internal rail" style="max-width:120px">
+                <a id="del" class="ui very basic inverted icon button" data-content="Delete User">
+                    <i class="ui black trash icon"></i>
+                </a>
+                <a id="edit" class="ui very basic inverted icon button" data-content="Edit User">
+                    <i class="ui black edit icon"></i>
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% if users %}
+        <script>
+            $(function(){
+                $('.segment').each(function(){
+                    var userID=$(this).find('span').text();
+                    $(this).find('#del').attr('href','/?table=users&col=userID&q='+userID+'&opt=del');
+                    $(this).find('#edit').attr('href','/editUser/?table=users&col=userID&q='+userID);
+                });
+            });
+        </script>
+    {% endif %}
+{% endmacro %}
+
+{% macro record(records, auth) %}
+    {% for record in records %}
+        <div class="ui piled segment">
+            <h4 class="header">{{record.recordID}}</h4>
+            <div>userID: {{record.userID}}</div>
+            <div>bookID: {{record.bookID}}</div>
+            <div>lendTime: {{record.lendTime}}</div>
+            <div>returnTime: {{record.returnTime}}</div>
+            <div>status:
+
+                {% if record.status === "pending" %}
+                    <span class="text" style="color:yellow">
+                {% elif record.status === "lending" %}
+                    <span class="text" style="color:red">
+                {% elif record.status === "returning" %}
+                    <span class="text" style="color:blue">
+                {% else %}
+                    <span class="text" style="color:green">
+                {% endif %}
+
+                {{record.status}}</span>
+            </div>
+
+            {% if auth === 'user' %}
+                {% if record.status === 'lending' %}
+                    <div class="ui right internal rail" style="max-width:80px">
+                        <a id="lend" class="ui very basic inverted icon button" data-content="Return Book">
+                            <i class="ui black paper plane outline icon"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            {% else %}
+                {% if record.status === 'pending' or record.status === 'returning' %}
+                    <div class="ui right internal rail" style="max-width:80px">
+                        <a id="verify" class="ui very basic inverted icon button" data-content="Verify">
+                            <i class="ui black check icon"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    {% if records %}
+        {% if auth === 'user' %}
+            <script>
+                $(function(){
+                    $('.segment').each(function(){
+                        $(this).find('#lend').attr('href','/lends/?table=records&col=recordID&q='+$(this).find('.header').text()+'&opt=return');
+                    });
+                });
+            </script>
+        {% else %}
+            <script>
+                $(function(){
+                    $('.piled').each(function(){
+                        $(this).find('#verify').attr('href','/?table=records&col=recordID&q='+$(this).find('.header').text()+'&opt=verify');
+                    });
+                });
+            </script>
+        {% endif %}
+    {% endif %}
+{% endmacro %}

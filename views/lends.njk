@@ -1,0 +1,10 @@
+{% extends 'user.njk' %}
+{% import 'segments.njk' as segments %}
+
+{% block head %}
+    <title>Lending Books of {{userID}}</title>
+{% endblock %}
+
+{% block main %}
+    {{ segments.record(records,'user') }}
+{% endblock %}

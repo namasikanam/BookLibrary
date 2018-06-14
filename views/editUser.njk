@@ -1,0 +1,14 @@
+{% extends "admin.njk" %}
+{% import 'userForm.njk' as userForm %}
+
+{% block head %}
+    <title>Edit A User In Library</title>
+{% endblock %}
+
+{% block script %}
+    {{ userForm.script() }}
+{% endblock %}
+
+{% block main %}
+    {{ userForm.form('/editUser', 'Edit user', user.userID, user.userName, user.password) }}
+{% endblock %}

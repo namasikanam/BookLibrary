@@ -1,0 +1,105 @@
+{% macro script() %}
+    <script>
+        $(function(){
+            $('form.piled').form({
+                fields: {
+                    userID: {
+                        rules: [{
+                            type: 'empty',
+                            prompt: 'Please enter your username.'
+                        },{
+                            type: 'regExp',
+                            value: /^[a-z0-9\_]+$/i,
+                            prompt: `You must only use 'a'-'z','A'-'Z','0'-'9','_' for your username.`
+                        },{
+                            type: 'notExactly[admin]',
+                            prompt: `Your username must not be 'admin'.`
+                        }]
+                    },
+                    userName: {
+                        rules: [{
+                            type: 'empty',
+                            prompt: 'Please enter your name.'
+                        },{
+                            type: 'regExp',
+                            value: /^[a-z0-9\_]+$/i,
+                            prompt: `You must only use 'a'-'z','A'-'Z','0'-'9','_' for your name.`
+                        }]
+                    },
+                    password: {
+                        identifier: 'password',
+                        rules: [{
+                            type: 'minLength[6]',
+                            prompt: 'Your password must be at least 6 characters.'
+                        },{
+                            type: 'regExp',
+                            value: /^[a-z0-9\_\@\.]+$/i,
+                            prompt: `You must only use 'a'-'z','A'-'Z','0'-'9','_','@','.' for your password.`
+                        }]
+                    },
+                    confirmPassword: {
+                        identifier: 'confirmPassword',
+                        rules: [{
+                            type: 'match',
+                            value: 'password',
+                            prompt: `Password doesn't match.`
+                        }]
+                    }
+                },
+                inline: true,
+                on: 'change'
+            });
+        });
+    </script>
+{% endmacro %}
+
+{% macro form(action, submit, userID='', userName='', password='') %}
+    <div class="ui center aligned middle aligned grid">
+        <div class="column" style="max-width:1000px">
+            <form class="ui large form piled segment" action="{{ action }}" method="post">
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+
+                        {% if userID %}
+                            <input type="text" placeholder="Username" maxlength="16" value="{{userID}}" disabled>
+                            <input name="userID" value="{{userID}}" hidden>
+                        {% else %}
+                            <input type="text" name="userID" placeholder="Username" maxlength="16" autofocus>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+
+                        {% if userID %}
+                            <input type="text" name="userName" placeholder="Name" maxlength="32" value="{{userName}}" autofocus>
+                            
+                        {% else %}
+                            <input type="text" name="userName" placeholder="Name" maxlength="32">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="password" id="password" name="password" placeholder="Password" maxlength="24" value="{{password}}">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="password" name="confirmPassword" placeholder="Confirm Password" maxlength="24" value="{{password}}">
+                    </div>
+                </div>
+
+                <div class="ui fluid large submit button">{{submit}}</div>
+            </form>
+        </div>
+    </div>
+{% endmacro %}

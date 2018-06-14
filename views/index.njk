@@ -1,0 +1,100 @@
+{% extends "base.njk" %}
+
+{% block head %}
+    <title>TA's Library</title>
+
+    <script>
+        history.replaceState({},`TA's Library`,'/');
+    </script>
+{% endblock %}
+
+{% block script %}
+    <script>
+        $(function(){
+            //initialize dropdown
+            $('.ui.dropdown').dropdown();
+            //initialize sign in form
+            $('#signIn').form({
+                fields: {
+                    userID: {
+                        identifier: 'userID',
+                        rules: [{
+                            type: 'empty',
+                            prompt: 'Please enter your username.'
+                        },{
+                            type: 'regExp',
+                            value: /^[a-z0-9\_]+$/i,
+                            prompt: `You must only use 'a'-'z','A'-'Z','0'-'9','_' for your username.`
+                        }]
+                    },
+                    password: {
+                        identifier: 'password',
+                        rules: [{
+                            type: 'minLength[6]',
+                            prompt: 'Your password must be at least 6 characters.'
+                        },{
+                            type: 'regExp',
+                            value: /^[a-z0-9\_\@\.]+$/i,
+                            prompt: `You must only use 'a'-'z','A'-'Z','0'-'9','_','@','.' for your password.`
+                        }]
+                    }
+                }
+            });
+            //override enter keydown
+            $('form#signIn input').keydown(function (e) {
+                if (e.which == 13) {
+                    $('form#signIn').submit();
+                    return false;
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block menu %}
+    <div class="ui search white disabled fluid item" style="flex-grow:1;">
+        <div class="ui transparent icon input">
+            <input class="prompt" type="text" placeholder="Search books...">
+            <i class="search link icon"></i>
+        </div>
+        <div class="results"></div>
+    </div>
+
+    <div class="right menu">
+        <div class="ui dropdown item">
+            <div>
+                <i class="sign in icon"></i>
+                <span class="text">Sign in</span>
+            </div>
+
+            <div class="menu">
+                <form id="signIn" class="ui form segment" action="/signIn" method="post">
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="user icon"></i>
+                            <input type="text" name="userID" placeholder="Username" maxlength="16">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            <input type="password" name="password" placeholder="Password" maxlength="24">
+                        </div>
+                    </div>
+
+                    <div class="ui fluid submit button">Sign in</div>
+                    
+                    <div class="ui error message"></div>
+                </form>
+
+                <div class="item"></div>
+            </div>
+        </div>
+
+        <a class="item" href="/signUp">
+            <i class="user plus icon"></i>
+            <span class="text">Sign up</span>
+        </a>
+    </div>
+{% endblock %}
