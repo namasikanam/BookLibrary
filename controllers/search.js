@@ -40,6 +40,17 @@ module.exports = {
                     }
                     else if (opt == 'ebook') {
                         if (col != 'bookID') return next();
+
+                        if (ctx.ebook[q])
+                            return render('addBook.njk', {
+                                message: {
+                                    type: 'negative',
+                                    head: 'Add Book Error:',
+                                    body: 'The bookID ' + bookID + ' is being handled by another.'
+                                }
+                            });
+                        ctx.ebook[q] = 1;
+
                         var book = await ctx.findOne('books', {
                             bookID: q
                         });
@@ -53,6 +64,8 @@ module.exports = {
 
                         ctx.response.attachment(book['eBook']);
                         ctx.response.body = fs.createReadStream(path.join('./eBooks', book['bookID']));
+
+                        ctx.ebook[q] = 0;
                     }
                     else {//search
                         if (q[0] === ':')
@@ -70,6 +83,8 @@ module.exports = {
                                 })
                             });
                     }
+
+
                 }
                 else if (table === 'users') {//readers
                     if (opt === 'del') {
@@ -191,6 +206,16 @@ module.exports = {
             else {
                 if (opt === 'ebook') {//download ebook
                     if (col != 'bookID') return next();
+                    if (ctx.ebook[q])
+                        return render('addBook.njk', {
+                            message: {
+                                type: 'negative',
+                                head: 'Add Book Error:',
+                                body: 'The bookID ' + bookID + ' is being handled by another.'
+                            }
+                        });
+                    ctx.ebook[q] = 1;
+
                     var book = await ctx.findOne('books', {
                         bookID: q
                     });
@@ -205,6 +230,8 @@ module.exports = {
 
                     ctx.response.attachment(book['eBook']);
                     ctx.response.body = fs.createReadStream(path.join('./eBooks', book['bookID']));
+
+                    ctx.ebook[q] = 0;
                 }
                 else if (opt === 'lend') {//lending request
                     if (col != 'bookID') return next();
@@ -262,7 +289,7 @@ module.exports = {
                             books: await ctx.findAllReg(table, col, q.substring(1))
                         });
                     else if (q === "")
-                        return ctx.render('admin.njk', {
+                        return ctx.render('user.njk', {
                             userID: userID,
                             books: await ctx.findAllReg(table, col, '.*')
                         });

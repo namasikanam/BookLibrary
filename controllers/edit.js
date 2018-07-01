@@ -14,7 +14,7 @@ module.exports = {
                 col = ctx.query.col,
                 q = ctx.query.q;
 
-            if (table != 'books' && col != 'bookID') return next();
+            if (table != 'books' && col != 'bookID') return next();;
             var book = await ctx.findOne('books', {
                 bookID: q
             });
@@ -37,12 +37,11 @@ module.exports = {
         var
             bookID = ctx.request.body.bookID,
             bookName = ctx.request.body.bookName,
-            eBook = ctx.request.files.eBook,
-            book = await ctx.findOne('books', {
-                bookID: bookID
-            });
-        console.log('bookID=' + bookID);
-        console.log('bookName=' + bookName);
+            eBook = ctx.request.files.eBook;
+
+        var book = await ctx.findOne('books', {
+            bookID: bookID
+        });
 
         if (book) {
             book.bookName = bookName;
@@ -51,12 +50,24 @@ module.exports = {
             book.returned += ctx.request.body.number;
 
             if (eBook) {
+                if (ctx.ebook[bookID])
+                    return render('addBook.njk', {
+                        message: {
+                            type: 'negative',
+                            head: 'Add Book Error:',
+                            body: 'The bookID ' + bookID + ' is being handled by another.'
+                        }
+                    });
+                ctx.ebook[bookID] = 1;
+
                 book.eBook = eBook.name;
                 fs.unlinkSync(path.join('./eBooks', bookID));
                 var
                     reader = fs.createReadStream(ctx.request.files.eBook.path),
                     writer = fs.createWriteStream(path.join('./eBooks', bookID));
-                reader.pipe(writer);
+                await reader.pipe(writer);
+
+                ctx.ebook[bookID] = 0;
             }
             book.save();
 
@@ -64,7 +75,7 @@ module.exports = {
                 book: book,
                 message: {
                     type: 'success',
-                    head: 'Edit Book Success',
+                    head: 'Edit Book Success:',
                     body: 'You have edited the book: ' + bookName + '(' + bookID + ')'
                 }
             });
@@ -82,6 +93,7 @@ module.exports = {
         var userID = ctx.cookies.get('userID', {
             signed: true
         });
+
         if (userID === 'admin') {
             var
                 table = ctx.query.table,
@@ -110,11 +122,12 @@ module.exports = {
     'POST /editUser': async (ctx, next) => {
         var userID = ctx.request.body.userID,
             userName = ctx.request.body.userName,
-            password = ctx.request.body.password,
-            exist = await ctx.update('users', userID, {
-                password: password,
-                userName: userName
-            });
+            password = ctx.request.body.password;
+
+        var exist = await ctx.update('users', userID, {
+            password: password,
+            userName: userName
+        });
         if (exist[0])
             ctx.render('editUser.njk', {
                 user: {

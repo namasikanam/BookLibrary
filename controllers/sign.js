@@ -1,3 +1,5 @@
+config = require('../config.js');
+
 module.exports = {
     'GET /signOut': async (ctx, next) => {
         await ctx.cookies.set('userID', '', {
@@ -26,7 +28,7 @@ module.exports = {
         console.log(`userID=${userID}`);
         console.log(`password=${password}`);
 
-        if (userID === 'admin' && password === 'TAisnotadmin.') {
+        if (userID === 'admin' && password === config.adminPassword) {
             await ctx.cookies.set('userID', 'admin', {
                 signed: true
             });
@@ -83,7 +85,12 @@ module.exports = {
             });
         }
         else ctx.render('signUp.njk', {
-            userID: userID
+            userID: userID,
+            message: {
+                type: 'negative',
+                head: 'Sign up Fail:',
+                body: 'Username has existed.'
+            }
         });
     }
 }

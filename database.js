@@ -42,6 +42,7 @@ module.exports = async (ctx, next) => {
     };
     ctx.findAllReg = async (table, col, reg) => {
         if ((table && col && reg) === undefined) throw new Error("No enough arguments for findAllReg!");
+        console.log('regexp=' + reg);
 
         return models[table].findAll({
             where: {

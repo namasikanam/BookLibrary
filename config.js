@@ -1,11 +1,13 @@
 const Sequelize = require('sequelize');
 
 module.exports = {
-    database: 'lib',
+    database: 'lib_db',
     username: 'root',
-    password: 'Winter_is_coming',
+    password: 'password',
     host: 'localhost',
     port: 3306,
+
+    adminPassword: 'adminadmin',
 
     tables: {
         debug: true,
