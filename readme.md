@@ -39,6 +39,8 @@ or
 ```
 npm start
 ```
+Access to [localhost:8080](localhost:8080).
+
 
 ### Debug
 ```
